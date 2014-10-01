@@ -20,6 +20,8 @@ describe('User Model', function() {
   });
 
   afterEach(function(done) {
+    // Renew user object. Mongoose does not insert to database object that already have been saved.
+    user = new User(user);
     User.remove().exec().then(function() {
       done();
     });
@@ -43,10 +45,27 @@ describe('User Model', function() {
   });
 
   it('should fail when saving without an email', function(done) {
-    user.email = '';
-    user.save(function(err) {
+    var userBroken = new User(user);
+    userBroken.email = '';
+    userBroken.save(function(err) {
       should.exist(err);
       done();
+    });
+  });
+
+  it('should fail when saving a user with already occupied email', function(done) {
+    var userAnother = new User({
+      provider: 'local',
+      name: 'Another ' + user.name,
+      email: user.email,
+      password: 'differentpassword'
+    });
+    user.save(function(err, _user) {
+      should.not.exist(err);
+      userAnother.save(function(err) {
+        should.exist(err);
+        done();
+      });
     });
   });
 
