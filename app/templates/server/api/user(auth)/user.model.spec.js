@@ -54,7 +54,7 @@ describe('User Model', function() {
   });
 
   it('should fail when saving a user with already occupied email', function(done) {
-    var userAnother = new User({
+    var userDiff = new User({
       provider: 'local',
       name: 'Another ' + user.name,
       email: user.email,
@@ -62,7 +62,7 @@ describe('User Model', function() {
     });
     user.save(function(err, _user) {
       should.not.exist(err);
-      userAnother.save(function(err) {
+      userDiff.save(function(err) {
         should.exist(err);
         done();
       });
